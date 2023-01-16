@@ -1,0 +1,28 @@
+{
+  "name": "test-grpc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "node src/server",
+    "client": "node src/client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ifundeasy/test-grpc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ifundeasy/test-grpc/issues"
+  },
+  "homepage": "https://github.com/ifundeasy/test-grpc#readme",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.6.7",
+    "@grpc/proto-loader": "^0.6.13",
+    "bluebird": "^3.7.2",
+    "mali": "^0.46.1"
+  }
+}

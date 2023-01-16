@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package Book;
+
+message BookEmpty {}
+
+message BookId {
+  uint32 id = 1;
+}
+
+// used for adding data
+message BookPayload {
+  optional uint32 id = 1;
+  string title = 2;
+  uint32 chapters = 3;
+  optional string notes = 4;
+}
+
+// used for update data payload
+message BookUpdate {
+  optional string title = 1;
+  optional uint32 chapters = 2;
+  optional string notes = 3;
+}
+
+// since rpc service only support one argument, we wrap inside "update" key
+message BookUpdatePayload {
+  uint32 id = 1;
+  BookUpdate update = 2;
+}
+
+service BookMethod {
+  rpc CreateBook (BookPayload) returns (BookRows) {}
+  rpc GetBooks (BookEmpty) returns (BookRows) {}
+  rpc GetBookById (BookId) returns (BookRows) {}
+  rpc DeleteBookById (BookId) returns (BookId) {}
+  rpc UpdateBookById (BookUpdatePayload) returns (BookRows) {}
+}
+
+// used for response
+message BookRows {
+  repeated BookPayload rows = 1;
+}
