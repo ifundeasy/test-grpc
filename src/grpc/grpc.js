@@ -4,9 +4,11 @@ const { grpc: config} = require('../config');
 const modules = require('./modules');
 
 module.exports = class GRPC {
-  constructor(opts) {
+  constructor(forever = false, opts = {}) {
     const me = this;
 
+    me.polling = undefined;
+    me.forever = forever;
     me.opts = opts;
     me.app = new Mali();
 
@@ -31,22 +33,38 @@ module.exports = class GRPC {
   }
 
   #printState(server) {
-    console.log(`gRPC ${server.started ? 'STARTED' : 'STOPPED'} on 0.0.0.0:${config.port}`)
+    if (server) console.log(`gRPC ${server.started ? 'started' : 'closed'} on 0.0.0.0:${config.port}`)
   }
 
-  start(callback) {
+  keepAlive() {
     const me = this;
-    this.app.start(`0.0.0.0:${config.port}`).then((server) => {
-      me.#printState(server);
-      if (typeof callback === 'function') callback(server, me.app.servers)
-    });
+    if (!!me.polling && !(me.polling || {})._destroyed) clearInterval(me.polling);
+    me.polling = setInterval(function () {
+      // * Mali will always push when grpc server start, we just need to check last index of servers
+      if (!me.app.servers[me.app.servers.length -1 ].server.started) {
+        me.start(() => console.debug('gRPC force started!'))
+      }
+    }, 200)
   }
 
-  close(callback) {
+  async start(callback) {
     const me = this;
-    this.app.close().then(() => {
-      me.app.servers.map(me.#printState);
-      if (typeof callback === 'function') callback(me.app.servers)
-    });
+
+    if (me.forever) me.keepAlive();
+    
+    const server = await this.app.start(`0.0.0.0:${config.port}`);
+    me.#printState(server);
+    if (typeof callback === 'function') callback(server, me.app.servers)
+  }
+
+  async close(callback) {
+    const me = this;
+    
+    await this.app.close()
+
+    // * Mali will always push when grpc server start, we just need to check last index of servers
+    me.#printState(me.app.servers[me.app.servers.length - 1])
+    
+    if (typeof callback === 'function') callback(me.app.servers)
   }
 }

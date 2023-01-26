@@ -1,5 +1,6 @@
-const maxRetries = 5;
-const delayer = 3000;
+const maxInterval = 5;
+const period = 1000;
+
 const {
   StatusBuilder,
   ListenerBuilder,
@@ -83,7 +84,7 @@ const Interceptor = function(options, nextCall) {
           savedMessageNext = next;
         })
         .withOnReceiveStatus(function(status, next) {
-            var retries = 0;
+            var retries = 1;
             var retry = function(message, metadata) {
               retries++;
               var newCall = nextCall(options);
@@ -93,12 +94,12 @@ const Interceptor = function(options, nextCall) {
                   receivedMessage = message;
                 },
                 onReceiveStatus: async function(status) {
-                  await Promise.delay(delayer);
+                  await Promise.delay(period);
 
-                  console.log(`Retries: ${retries}`);
+                  console.log(`... Try to reach grpc=${loader.host}; count=${period/1000}s; retry=${retries - 1}/${maxInterval}`);
                   Registry.addCall('retry_' + savedMetadata.get('name') + '_' + retries);
                   if (status.code !== Statuses.OK) {
-                    if (retries <= maxRetries) {
+                    if (retries <= maxInterval) {
                       retry(message, metadata);
                     } else {
                       savedMessageNext(receivedMessage);
@@ -137,7 +138,9 @@ const Interceptor = function(options, nextCall) {
   return new InterceptingCall(nextCall(options), requester);
 };
 
-module.exports = (config, opts = {}) => {
+function loader(config, opts = {}) {
+  loader.host = config.host;
+
   const packageDefinition = protoLoader.loadSync(config.proto, opts);
   const grpcObject = loadPackageDefinition(packageDefinition);
   const client = new grpcObject[config.name][config.service](
@@ -147,4 +150,6 @@ module.exports = (config, opts = {}) => {
   );
 
   return client
-};
+}
+
+module.exports = loader;

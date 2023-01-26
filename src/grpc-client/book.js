@@ -4,7 +4,7 @@ const { grpc: { host, opts } } = require('../config');
 const grpcClient = require('../../utils/grpc-client');
 
 
-module.exports = class EnumerationGRPCClient {
+module.exports = class BookGRPCClient {
   constructor() {
     this.module = {
       name: 'Book', // Package name inside .proto

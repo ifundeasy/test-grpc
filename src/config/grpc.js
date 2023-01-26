@@ -1,6 +1,6 @@
 module.exports = {
-  port: process.env.PORT || 10000,
-  host: process.env.RPC_URL || 'localhost:10000',
+  port: process.env.PORT || 8081,
+  host: process.env.RPC_URL || 'localhost:8081',
   opts: {
     keepCase: true,
     longs: String,

@@ -8,6 +8,9 @@ const book = new Book();
 // book.updateById({ id: 1, update: { title: 'yo', chapters: 16 } }).then(console.log)
 // book.deleteById(2).then(console.log)
 
-
 // * Test the methods
-book.getAll().then(console.log)
+const main = () => book.getAll().then(console.log)
+
+if (require.main === module) return main()
+
+module.exports = main;
