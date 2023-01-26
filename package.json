@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "node src/server",
+    "server:dev": "nodemon src/server",
     "client": "node src/client"
   },
   "repository": {
@@ -24,6 +25,7 @@
     "@grpc/proto-loader": "^0.6.13",
     "bluebird": "^3.7.2",
     "lodash": "^4.17.21",
-    "mali": "^0.46.1"
+    "mali": "^0.46.1",
+    "nodemon": "^2.0.20"
   }
 }

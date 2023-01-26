@@ -30,8 +30,23 @@ module.exports = class GRPC {
     });
   }
 
-  start() {
-    this.app.start(`0.0.0.0:${config.port}`);
-    console.info(`gRPC started on 0.0.0.0:${config.port}`);
+  #printState(server) {
+    console.log(`gRPC ${server.started ? 'STARTED' : 'STOPPED'} on 0.0.0.0:${config.port}`)
+  }
+
+  start(callback) {
+    const me = this;
+    this.app.start(`0.0.0.0:${config.port}`).then((server) => {
+      me.#printState(server);
+      if (typeof callback === 'function') callback(server, me.app.servers)
+    });
+  }
+
+  close(callback) {
+    const me = this;
+    this.app.close().then(() => {
+      me.app.servers.map(me.#printState);
+      if (typeof callback === 'function') callback(me.app.servers)
+    });
   }
 }
